@@ -1,10 +1,10 @@
 /* ===========================================================================
-   FloodBuddy — eclectic, mobile-first.
-   Stark white base · deep wine → dark-pink gradients.
+   FloodBuddy — flat, spacious, minimalist.
+   Stark white interaction surface · deep wine → dark-pink gradient for the
+   splash & sign-in. No cards, no panels, no box-shadows.
    =========================================================================== */
 
 :root {
-  /* Wine / dark-pink palette */
   --wine-900: #3d0c1c;
   --wine-700: #5c1a2b;
   --wine-500: #7a2438;
@@ -14,379 +14,311 @@
 
   --ink: #1a1014;
   --muted: #8a6b75;
-  --line: #f0e4e8;
-  --white: #ffffff;
-  --off: #fffafc;
+  --line: #efe2e7;
+  --off: #fdf7f9;
 
+  /* The gradient stays exactly as it was. */
   --grad-wine: linear-gradient(135deg, var(--wine-900) 0%, var(--wine-700) 45%, var(--pink-500) 100%);
-  --grad-pink: linear-gradient(120deg, var(--pink-600) 0%, var(--pink-400) 100%);
 
-  --radius: 20px;
-  --radius-sm: 12px;
-  --shadow: 0 18px 40px -18px rgba(92, 26, 43, 0.45);
+  --r: 14px;
+  --r-sm: 10px;
 
   --font: 'Helvetica Neue', 'Segoe UI', system-ui, -apple-system, sans-serif;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
-
 html, body, #root { height: 100%; }
 
 body {
   font-family: var(--font);
   color: var(--ink);
-  background: var(--white);
+  background: #fff;
   -webkit-font-smoothing: antialiased;
 }
+button { font-family: inherit; }
 
-/* --- Layout shell ---------------------------------------------------------- */
-.app {
-  min-height: 100%;
-  display: flex;
-  flex-direction: column;
-  max-width: 520px;
-  margin: 0 auto;
-  background: var(--white);
-}
+/* --- Brand wordmark -------------------------------------------------------- */
+.brand { font-weight: 800; font-size: 1.4rem; letter-spacing: -0.03em; color: var(--wine-700); }
+.brand__accent { color: var(--pink-500); }
+.brand--light { color: #fff; }
+.brand--light .brand__accent { color: #ffd1e3; }
+.brand--lg { font-size: clamp(2.2rem, 9vw, 2.8rem); }
 
-.app__header {
-  padding: 2.4rem 1.5rem 3.6rem;
+/* --- Full-gradient screens (splash, sign-in, loading) ---------------------- */
+.fullbg, .splash, .signin {
+  min-height: 100vh;
+  min-height: 100dvh;
   background: var(--grad-wine);
-  color: var(--white);
-  border-bottom-left-radius: 36px;
-  border-bottom-right-radius: 36px;
-  position: relative;
-  overflow: hidden;
-}
-
-/* eclectic offset blob accent */
-.app__header::after {
-  content: '';
-  position: absolute;
-  right: -60px;
-  top: -60px;
-  width: 180px;
-  height: 180px;
-  background: var(--grad-pink);
-  filter: blur(6px);
-  opacity: 0.55;
-  border-radius: 48% 52% 33% 67% / 57% 43% 57% 43%;
-}
-
-.app__brand {
-  font-size: 2.4rem;
-  font-weight: 800;
-  letter-spacing: -0.03em;
-}
-.app__brand-accent { color: #ffd6e6; }
-
-.app__tagline {
-  margin-top: 0.4rem;
-  font-size: 0.98rem;
-  opacity: 0.9;
-  max-width: 22ch;
-}
-
-.app__main {
-  flex: 1;
-  padding: 0 1.25rem;
-  margin-top: -2rem; /* lift the card to overlap the header */
-}
-
-.app__footer {
-  text-align: center;
-  padding: 1.6rem 1rem 2rem;
-  color: var(--muted);
-  font-size: 0.8rem;
-}
-
-/* --- Card ------------------------------------------------------------------ */
-.card {
-  background: var(--white);
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-  padding: 1.25rem;
+  color: #fff;
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 2rem;
+}
+.signin a, .splash a, .fullbg a { color: #fff; text-decoration: underline; font-weight: 600; }
+
+/* --- Splash intro ---------------------------------------------------------- */
+.splash { position: relative; cursor: pointer; user-select: none; }
+.splash__brand { position: absolute; top: 2.2rem; font-size: 1.05rem; opacity: 0.92; }
+
+/* art + phrase animate in together each frame */
+.splash__frame {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.6rem;
+  animation: frameIn 520ms cubic-bezier(0.2, 0.75, 0.2, 1) both;
+}
+.splash__art { display: flex; }
+.splash__art svg {
+  width: clamp(78px, 22vw, 104px);
+  height: auto;
+  /* a soft glow lifts the multicolor art off the deep gradient */
+  filter: drop-shadow(0 6px 16px rgba(0, 0, 0, 0.18));
+  animation: artPop 620ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+.splash__phrase {
+  font-size: clamp(2.2rem, 10vw, 3.4rem);
+  font-weight: 800;
+  letter-spacing: -0.035em;
+  line-height: 1.04;
+  max-width: 16ch;
+}
+@keyframes frameIn {
+  from { opacity: 0; transform: translateY(16px); filter: blur(5px); }
+  to   { opacity: 1; transform: none; filter: none; }
+}
+@keyframes artPop {
+  from { opacity: 0; transform: scale(0.7) translateY(8px); }
+  to   { opacity: 1; transform: none; }
+}
+.splash__dots { position: absolute; bottom: 2.4rem; display: flex; gap: 7px; }
+.splash__dots span {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transition: all 0.35s ease;
+}
+.splash__dots span.on { background: #fff; width: 22px; border-radius: 4px; }
+
+/* Slow fade-away of the splash contents to reveal the page beneath. The
+   gradient background is shared with the sign-in screen, so only the content
+   crossfades — no flash. */
+.splash--exit .splash__frame,
+.splash--exit .splash__brand,
+.splash--exit .splash__dots {
+  animation: splashOut 750ms ease forwards;
+}
+@keyframes splashOut {
+  from { opacity: 1; transform: translateY(0); filter: blur(0); }
+  to   { opacity: 0; transform: translateY(-14px); filter: blur(3px); }
 }
 
-/* --- File picker ----------------------------------------------------------- */
-.picker { display: flex; flex-direction: column; gap: 0.6rem; }
+/* --- Sign-in --------------------------------------------------------------- */
+.signin__inner {
+  width: 100%;
+  max-width: 330px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.6rem;
+  /* eases in as the splash fades out, completing the reveal */
+  animation: contentIn 650ms ease 80ms both;
+}
+@keyframes contentIn {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: none; }
+}
+.signin__tag { opacity: 0.85; font-size: 1rem; line-height: 1.5; max-width: 24ch; }
 
+/* Frosted button that blends into the gradient. */
+.gbtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.7rem;
+  width: 100%;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.10);
+  border: 1px solid rgba(255, 255, 255, 0.30);
+  border-radius: 999px;
+  padding: 0.85rem 1.4rem;
+  cursor: pointer;
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  transition: background 0.2s, border-color 0.2s, transform 0.08s;
+}
+.gbtn:hover { background: rgba(255, 255, 255, 0.18); border-color: rgba(255, 255, 255, 0.5); }
+.gbtn:active { transform: translateY(1px); }
+.gbtn__chip {
+  background: #fff;
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+}
+.signin__err { color: #ffd1e3; font-size: 0.9rem; }
+.signin__legal { font-size: 0.82rem; opacity: 0.8; line-height: 1.5; }
+
+/* --- App shell (flat & spacious) ------------------------------------------- */
+.app {
+  max-width: 480px;
+  margin: 0 auto;
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+}
+.app__bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.25rem 1.5rem;
+}
+.app__main { flex: 1; padding: 0.5rem 1.5rem 2.5rem; }
+.app__footer {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+  align-items: center;
+  padding: 1.5rem;
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+.app__footer a { color: var(--pink-600); font-weight: 600; text-decoration: none; }
+
+/* --- User badge ------------------------------------------------------------ */
+.userbadge { display: inline-flex; align-items: center; gap: 0.6rem; }
+.userbadge__avatar { width: 30px; height: 30px; border-radius: 50%; object-fit: cover; }
+.userbadge__signout {
+  background: none; border: none; padding: 0;
+  color: var(--muted); font-weight: 600; font-size: 0.85rem; cursor: pointer;
+}
+.userbadge__signout:hover { color: var(--pink-600); }
+
+/* --- Reporting form (flat, generous spacing) ------------------------------- */
+.form { display: flex; flex-direction: column; gap: 2rem; }
+
+.field { display: flex; flex-direction: column; gap: 0.6rem; }
+.field__label { font-size: 0.95rem; font-weight: 700; color: var(--ink); }
+.field__hint { font-size: 0.9rem; }
+.field__hint.ok { color: var(--wine-700); font-weight: 600; }
+.field__hint.err { color: var(--pink-600); }
+.accuracy { color: var(--muted); font-weight: 400; }
+.field__input {
+  font-family: inherit;
+  font-size: 1rem;
+  color: var(--ink);
+  padding: 0.9rem 1rem;
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  background: #fff;
+  resize: vertical;
+}
+.field__input:focus { outline: none; border-color: var(--pink-400); }
+
+/* --- File picker (the primary tap target) ---------------------------------- */
+.picker { display: flex; flex-direction: column; gap: 0.7rem; }
 .picker__drop {
   appearance: none;
-  border: 2px dashed var(--pink-400);
-  background: var(--off);
-  border-radius: var(--radius-sm);
-  min-height: 220px;
   width: 100%;
+  min-height: 260px;
+  border: 1.5px dashed var(--pink-400);
+  border-radius: var(--r);
+  background: var(--off);
   cursor: pointer;
   overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: border-color 0.2s, background 0.2s;
+  transition: background 0.2s, border-color 0.2s;
 }
-.picker__drop:active { background: #fff0f5; }
-
+.picker__drop:active { background: #fbeef3; }
 .picker__placeholder {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.6rem;
   color: var(--pink-600);
   font-weight: 600;
 }
-.picker__icon { font-size: 2.4rem; }
-
-.picker__preview {
-  width: 100%;
-  height: 100%;
-  max-height: 320px;
-  object-fit: cover;
-  display: block;
-}
-
+.picker__icon { font-size: 2.6rem; }
+.picker__preview { width: 100%; height: 100%; max-height: 360px; object-fit: cover; display: block; }
 .picker__retake {
-  align-self: flex-start;
-  background: none;
-  border: none;
-  color: var(--pink-600);
-  font-weight: 600;
-  font-size: 0.85rem;
-  cursor: pointer;
-  text-decoration: underline;
+  align-self: center;
+  background: none; border: none;
+  color: var(--pink-600); font-weight: 600; font-size: 0.88rem;
+  cursor: pointer; text-decoration: underline;
 }
 
-/* --- Fields ---------------------------------------------------------------- */
-.field { display: flex; flex-direction: column; gap: 0.5rem; }
-
-.field__label {
-  font-size: 0.78rem;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--wine-700);
-  font-weight: 700;
-}
-
-.field__input {
-  font-family: inherit;
-  font-size: 1rem;
-  color: var(--ink);
-  padding: 0.85rem 1rem;
-  border: 1.5px solid var(--line);
-  border-radius: var(--radius-sm);
-  background: var(--off);
-  resize: vertical;
-  transition: border-color 0.2s;
-}
-.field__input:focus {
-  outline: none;
-  border-color: var(--pink-400);
-}
-
-.field__hint { font-size: 0.85rem; }
-.field__hint.ok { color: var(--wine-700); font-weight: 600; }
-.field__hint.err { color: var(--pink-600); }
-.accuracy { color: var(--muted); font-weight: 400; }
-
-/* --- Buttons --------------------------------------------------------------- */
+/* --- Buttons (no shadow) --------------------------------------------------- */
 .btn {
-  font-family: inherit;
   font-size: 1rem;
   font-weight: 700;
   border-radius: 999px;
   padding: 0.95rem 1.4rem;
   cursor: pointer;
   border: none;
-  transition: transform 0.08s ease, filter 0.2s, box-shadow 0.2s;
+  transition: filter 0.2s, transform 0.08s, background 0.2s, color 0.2s;
 }
 .btn:active { transform: translateY(1px); }
-.btn:disabled { opacity: 0.6; cursor: not-allowed; }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.btn--primary { background: var(--grad-wine); color: #fff; }
+.btn--primary:hover:not(:disabled) { filter: brightness(1.07); }
+.btn--outline { background: #fff; color: var(--pink-600); border: 1.5px solid var(--pink-400); }
+.btn--ghost { background: var(--off); color: var(--wine-700); border: 1px solid var(--line); }
 
-.btn--primary {
-  background: var(--grad-wine);
-  color: var(--white);
-  box-shadow: 0 12px 24px -10px rgba(173, 20, 87, 0.6);
-}
-.btn--primary:hover:not(:disabled) { filter: brightness(1.06); }
-
-.btn--outline {
-  background: var(--white);
-  color: var(--pink-600);
-  border: 1.5px solid var(--pink-400);
-}
-
-.btn--ghost {
-  background: var(--off);
-  color: var(--wine-700);
-  border: 1.5px solid var(--line);
-}
-
-/* --- Banners --------------------------------------------------------------- */
-.banner {
-  border-radius: var(--radius-sm);
-  padding: 0.7rem 0.9rem;
-  font-size: 0.9rem;
-  font-weight: 600;
-}
-.banner--err {
-  background: #fff0f4;
-  color: var(--pink-600);
-  border: 1px solid #ffd6e6;
-}
+/* --- Banner ---------------------------------------------------------------- */
+.banner { border-radius: var(--r-sm); padding: 0.7rem 0.9rem; font-size: 0.9rem; font-weight: 600; }
+.banner--err { background: #fdeef3; color: var(--pink-600); }
 
 /* --- Success --------------------------------------------------------------- */
-.success { text-align: center; }
+.success { display: flex; flex-direction: column; gap: 1rem; text-align: center; padding-top: 0.5rem; }
 .success__title { color: var(--wine-700); font-size: 1.5rem; }
-.success__sub { color: var(--muted); margin-top: 0.25rem; }
-.success__img {
-  width: 100%;
-  border-radius: var(--radius-sm);
-  margin: 1rem 0;
-  object-fit: cover;
-  max-height: 280px;
-}
-
-.meta {
-  text-align: left;
-  display: flex;
-  flex-direction: column;
-  gap: 0.6rem;
-  margin-bottom: 1.25rem;
-}
+.success__sub { color: var(--muted); }
+.success__img { width: 100%; border-radius: var(--r); object-fit: cover; max-height: 300px; }
+.meta { text-align: left; display: flex; flex-direction: column; }
 .meta > div {
-  display: flex;
-  justify-content: space-between;
-  gap: 1rem;
-  border-bottom: 1px solid var(--line);
-  padding-bottom: 0.5rem;
+  display: flex; justify-content: space-between; gap: 1rem;
+  padding: 0.7rem 0; border-bottom: 1px solid var(--line);
 }
-.meta dt { color: var(--muted); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.06em; }
+.meta dt { color: var(--muted); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; }
 .meta dd { color: var(--ink); font-weight: 600; text-align: right; }
 .mono { font-family: ui-monospace, 'SFMono-Regular', Menlo, monospace; font-size: 0.78rem; }
 
-/* --- Loading --------------------------------------------------------------- */
-.loading { text-align: center; color: var(--muted); padding: 2rem 1rem; }
-
-/* --- Auth / sign-in -------------------------------------------------------- */
-.auth { text-align: center; align-items: center; }
-.auth__mark { font-size: 2.6rem; }
-.auth__title { color: var(--wine-700); font-size: 1.5rem; }
-.auth__sub { color: var(--muted); font-size: 0.95rem; max-width: 34ch; }
-.auth__legal { font-size: 0.8rem; color: var(--muted); }
-.auth__legal a, .consent a, .app__footer a, .legal a { color: var(--pink-600); font-weight: 600; }
-
-.btn-google {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.7rem;
-  font-family: inherit;
-  font-size: 1rem;
-  font-weight: 600;
-  color: #3c4043;
-  background: #fff;
-  border: 1.5px solid #dadce0;
-  border-radius: 999px;
-  padding: 0.8rem 1.5rem;
-  cursor: pointer;
-  transition: box-shadow 0.2s, background 0.2s;
-}
-.btn-google:hover { box-shadow: 0 2px 8px rgba(60, 64, 67, 0.18); background: #fafafa; }
-
-/* --- User badge ------------------------------------------------------------ */
-.userbadge {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-top: 1rem;
-  background: rgba(255, 255, 255, 0.14);
-  border: 1px solid rgba(255, 255, 255, 0.25);
-  border-radius: 999px;
-  padding: 0.3rem 0.4rem 0.3rem 0.5rem;
-  font-size: 0.85rem;
-}
-.userbadge__avatar { width: 26px; height: 26px; border-radius: 50%; object-fit: cover; }
-.userbadge__name { color: #fff; font-weight: 600; max-width: 12ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.userbadge__signout {
-  background: #fff; color: var(--wine-700); border: none;
-  border-radius: 999px; padding: 0.3rem 0.7rem; font-weight: 700;
-  font-size: 0.78rem; cursor: pointer;
-}
-
-/* --- Consent gate ---------------------------------------------------------- */
+/* --- Consent (flat & spacious) --------------------------------------------- */
+.consent { display: flex; flex-direction: column; gap: 1.3rem; padding-top: 0.5rem; }
 .consent__title { color: var(--wine-700); font-size: 1.4rem; }
-.consent__sub { color: var(--muted); font-size: 0.92rem; }
-.consent__check {
-  display: flex;
-  gap: 0.65rem;
-  align-items: flex-start;
-  font-size: 0.9rem;
-  line-height: 1.45;
-  background: var(--off);
-  border: 1px solid var(--line);
-  border-radius: var(--radius-sm);
-  padding: 0.8rem 0.9rem;
-}
-.consent__check input { margin-top: 0.2rem; width: 18px; height: 18px; accent-color: var(--pink-500); flex-shrink: 0; }
-.consent__foot { font-size: 0.78rem; color: var(--muted); text-align: center; }
+.consent__sub { color: var(--muted); font-size: 0.95rem; line-height: 1.5; }
+.consent__check { display: flex; gap: 0.7rem; align-items: flex-start; font-size: 0.92rem; line-height: 1.5; }
+.consent__check input { margin-top: 0.15rem; width: 20px; height: 20px; accent-color: var(--pink-500); flex-shrink: 0; }
+.consent a { color: var(--pink-600); font-weight: 600; }
+.consent__foot { font-size: 0.8rem; color: var(--muted); text-align: center; }
 
-/* --- Legal pages ----------------------------------------------------------- */
-.legal {
-  max-width: 760px;
-  margin: 0 auto;
-  padding: 1.25rem;
-  color: var(--ink);
+/* --- Error fallback -------------------------------------------------------- */
+.centered {
+  min-height: 100vh; min-height: 100dvh;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center; text-align: center;
+  gap: 1rem; padding: 2rem; max-width: 380px; margin: 0 auto;
 }
-.legal__header {
-  background: var(--grad-wine);
-  color: #fff;
-  border-radius: var(--radius);
-  padding: 1.5rem 1.4rem;
-  margin-bottom: 1.5rem;
-}
-.legal__back {
-  background: rgba(255, 255, 255, 0.16);
-  color: #fff;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  border-radius: 999px;
-  padding: 0.35rem 0.9rem;
-  font-weight: 600;
-  cursor: pointer;
-  font-size: 0.82rem;
-}
-.legal__title { margin-top: 0.8rem; font-size: 1.7rem; letter-spacing: -0.02em; }
-.legal__meta { opacity: 0.9; font-size: 0.85rem; margin-top: 0.25rem; }
+.centered__title { color: var(--wine-700); font-size: 1.4rem; }
+.centered__sub { color: var(--muted); }
 
-.legal__body { font-size: 0.95rem; line-height: 1.65; }
-.legal__body h2 {
-  color: var(--wine-700);
-  font-size: 1.1rem;
-  margin: 1.6rem 0 0.5rem;
-}
+/* --- Legal pages (clean document, no panels) ------------------------------- */
+.legal { max-width: 720px; margin: 0 auto; padding: 1.5rem 1.5rem 3rem; color: var(--ink); }
+.legal__header { padding: 1.5rem 0 1.25rem; border-bottom: 1px solid var(--line); margin-bottom: 1.5rem; }
+.legal__back { background: none; border: none; padding: 0; color: var(--pink-600); font-weight: 700; cursor: pointer; font-size: 0.9rem; }
+.legal__title { margin-top: 0.8rem; font-size: 1.8rem; letter-spacing: -0.02em; color: var(--wine-700); }
+.legal__meta { color: var(--muted); font-size: 0.85rem; margin-top: 0.25rem; }
+.legal__body { font-size: 0.95rem; line-height: 1.7; }
+.legal__body h2 { color: var(--wine-700); font-size: 1.1rem; margin: 1.7rem 0 0.5rem; }
 .legal__body h2.legal__warn { color: var(--pink-600); }
 .legal__body p { margin-bottom: 0.8rem; }
 .legal__body ul { margin: 0 0 0.9rem 1.2rem; display: flex; flex-direction: column; gap: 0.35rem; }
-.legal__body strong { color: var(--ink); }
-.legal__note {
-  margin-top: 2rem;
-  padding: 0.9rem 1rem;
-  background: #fff7fa;
-  border: 1px dashed var(--pink-400);
-  border-radius: var(--radius-sm);
-  font-size: 0.85rem;
-  font-style: italic;
-  color: var(--wine-700);
-}
-.legal__footer {
-  margin-top: 2rem;
-  padding-top: 1rem;
-  border-top: 1px solid var(--line);
-  display: flex;
-  gap: 0.6rem;
-  justify-content: center;
-  color: var(--muted);
-  font-size: 0.85rem;
-}
+.legal a { color: var(--pink-600); font-weight: 600; }
+.legal__note { margin-top: 2rem; padding-top: 1rem; border-top: 1px solid var(--line); font-size: 0.85rem; font-style: italic; color: var(--muted); }
+.legal__footer { margin-top: 2rem; padding-top: 1.25rem; border-top: 1px solid var(--line); display: flex; gap: 0.6rem; justify-content: center; color: var(--muted); font-size: 0.85rem; }

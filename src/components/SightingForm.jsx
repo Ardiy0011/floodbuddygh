@@ -59,7 +59,7 @@ export default function SightingForm() {
   // --- Success screen --------------------------------------------------------
   if (result) {
     return (
-      <div className="card success">
+      <div className="success">
         <h2 className="success__title">Report received 🌊</h2>
         <p className="success__sub">Thank you for keeping your community safe.</p>
         <img
@@ -79,7 +79,7 @@ export default function SightingForm() {
 
   // --- Form ------------------------------------------------------------------
   return (
-    <form className="card" onSubmit={handleSubmit}>
+    <form className="form" onSubmit={handleSubmit}>
       <FilePicker file={file} onSelect={setFile} />
 
       <section className="field">

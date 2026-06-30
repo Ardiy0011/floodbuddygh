@@ -1,10 +1,9 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth, GoogleAuthProvider } from 'firebase/auth';
 
-// These values come from your Firebase Web App config (Project Settings →
-// General → Your apps → Web app). They are NOT secrets — they identify the
-// project to Google and are safe to ship in the client bundle. Access is
-// controlled by Firebase Authentication settings + your authorized domains.
+// Firebase Web App config (Project Settings → General → Your apps → Web app).
+// These values identify the project to Google and are safe to ship in the
+// client bundle. They come from frontend/.env (VITE_FIREBASE_*).
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
   authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,

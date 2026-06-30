@@ -31,7 +31,7 @@ export default function ConsentGate() {
   const privacyV = requiredVersions?.privacy;
 
   return (
-    <div className="card consent">
+    <div className="consent">
       <h2 className="consent__title">Before you continue</h2>
       <p className="consent__sub">
         {user?.displayName ? `Hi ${user.displayName.split(' ')[0]}, ` : ''}

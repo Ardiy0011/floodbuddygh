@@ -16,26 +16,27 @@ export default function SignIn() {
   const { signIn, error } = useAuth();
 
   return (
-    <div className="card auth">
-      <div className="auth__mark">🌊</div>
-      <h2 className="auth__title">Welcome to FloodBuddy</h2>
-      <p className="auth__sub">
-        Sign in to report flooding in your community. We use your Google account
-        only to identify your reports.
-      </p>
+    <div className="signin">
+      <div className="signin__inner">
+        <div className="brand brand--light brand--lg">
+          Flood<span className="brand__accent">Buddy</span>
+        </div>
+        <p className="signin__tag">Community flood reporting for Ghana.</p>
 
-      <button type="button" className="btn-google" onClick={signIn}>
-        <GoogleMark />
-        Continue with Google
-      </button>
+        <button type="button" className="gbtn" onClick={signIn}>
+          <span className="gbtn__chip">
+            <GoogleMark />
+          </span>
+          Continue with Google
+        </button>
 
-      {error && <p className="banner banner--err">{error}</p>}
+        {error && <p className="signin__err">{error}</p>}
 
-      <p className="auth__legal">
-        By continuing you will be asked to review and accept our{' '}
-        <a href="#/terms">Terms of Service</a> and{' '}
-        <a href="#/privacy">Privacy Policy</a>.
-      </p>
+        <p className="signin__legal">
+          By continuing you agree to our <a href="#/terms">Terms</a> &amp;{' '}
+          <a href="#/privacy">Privacy Policy</a>.
+        </p>
+      </div>
     </div>
   );
 }
