@@ -1,0 +1,392 @@
+/* ===========================================================================
+   FloodBuddy — eclectic, mobile-first.
+   Stark white base · deep wine → dark-pink gradients.
+   =========================================================================== */
+
+:root {
+  /* Wine / dark-pink palette */
+  --wine-900: #3d0c1c;
+  --wine-700: #5c1a2b;
+  --wine-500: #7a2438;
+  --pink-600: #ad1457;
+  --pink-500: #c2185b;
+  --pink-400: #d81b60;
+
+  --ink: #1a1014;
+  --muted: #8a6b75;
+  --line: #f0e4e8;
+  --white: #ffffff;
+  --off: #fffafc;
+
+  --grad-wine: linear-gradient(135deg, var(--wine-900) 0%, var(--wine-700) 45%, var(--pink-500) 100%);
+  --grad-pink: linear-gradient(120deg, var(--pink-600) 0%, var(--pink-400) 100%);
+
+  --radius: 20px;
+  --radius-sm: 12px;
+  --shadow: 0 18px 40px -18px rgba(92, 26, 43, 0.45);
+
+  --font: 'Helvetica Neue', 'Segoe UI', system-ui, -apple-system, sans-serif;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body, #root { height: 100%; }
+
+body {
+  font-family: var(--font);
+  color: var(--ink);
+  background: var(--white);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* --- Layout shell ---------------------------------------------------------- */
+.app {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  max-width: 520px;
+  margin: 0 auto;
+  background: var(--white);
+}
+
+.app__header {
+  padding: 2.4rem 1.5rem 3.6rem;
+  background: var(--grad-wine);
+  color: var(--white);
+  border-bottom-left-radius: 36px;
+  border-bottom-right-radius: 36px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* eclectic offset blob accent */
+.app__header::after {
+  content: '';
+  position: absolute;
+  right: -60px;
+  top: -60px;
+  width: 180px;
+  height: 180px;
+  background: var(--grad-pink);
+  filter: blur(6px);
+  opacity: 0.55;
+  border-radius: 48% 52% 33% 67% / 57% 43% 57% 43%;
+}
+
+.app__brand {
+  font-size: 2.4rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+.app__brand-accent { color: #ffd6e6; }
+
+.app__tagline {
+  margin-top: 0.4rem;
+  font-size: 0.98rem;
+  opacity: 0.9;
+  max-width: 22ch;
+}
+
+.app__main {
+  flex: 1;
+  padding: 0 1.25rem;
+  margin-top: -2rem; /* lift the card to overlap the header */
+}
+
+.app__footer {
+  text-align: center;
+  padding: 1.6rem 1rem 2rem;
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+/* --- Card ------------------------------------------------------------------ */
+.card {
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+/* --- File picker ----------------------------------------------------------- */
+.picker { display: flex; flex-direction: column; gap: 0.6rem; }
+
+.picker__drop {
+  appearance: none;
+  border: 2px dashed var(--pink-400);
+  background: var(--off);
+  border-radius: var(--radius-sm);
+  min-height: 220px;
+  width: 100%;
+  cursor: pointer;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.2s, background 0.2s;
+}
+.picker__drop:active { background: #fff0f5; }
+
+.picker__placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--pink-600);
+  font-weight: 600;
+}
+.picker__icon { font-size: 2.4rem; }
+
+.picker__preview {
+  width: 100%;
+  height: 100%;
+  max-height: 320px;
+  object-fit: cover;
+  display: block;
+}
+
+.picker__retake {
+  align-self: flex-start;
+  background: none;
+  border: none;
+  color: var(--pink-600);
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+/* --- Fields ---------------------------------------------------------------- */
+.field { display: flex; flex-direction: column; gap: 0.5rem; }
+
+.field__label {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--wine-700);
+  font-weight: 700;
+}
+
+.field__input {
+  font-family: inherit;
+  font-size: 1rem;
+  color: var(--ink);
+  padding: 0.85rem 1rem;
+  border: 1.5px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--off);
+  resize: vertical;
+  transition: border-color 0.2s;
+}
+.field__input:focus {
+  outline: none;
+  border-color: var(--pink-400);
+}
+
+.field__hint { font-size: 0.85rem; }
+.field__hint.ok { color: var(--wine-700); font-weight: 600; }
+.field__hint.err { color: var(--pink-600); }
+.accuracy { color: var(--muted); font-weight: 400; }
+
+/* --- Buttons --------------------------------------------------------------- */
+.btn {
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 700;
+  border-radius: 999px;
+  padding: 0.95rem 1.4rem;
+  cursor: pointer;
+  border: none;
+  transition: transform 0.08s ease, filter 0.2s, box-shadow 0.2s;
+}
+.btn:active { transform: translateY(1px); }
+.btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.btn--primary {
+  background: var(--grad-wine);
+  color: var(--white);
+  box-shadow: 0 12px 24px -10px rgba(173, 20, 87, 0.6);
+}
+.btn--primary:hover:not(:disabled) { filter: brightness(1.06); }
+
+.btn--outline {
+  background: var(--white);
+  color: var(--pink-600);
+  border: 1.5px solid var(--pink-400);
+}
+
+.btn--ghost {
+  background: var(--off);
+  color: var(--wine-700);
+  border: 1.5px solid var(--line);
+}
+
+/* --- Banners --------------------------------------------------------------- */
+.banner {
+  border-radius: var(--radius-sm);
+  padding: 0.7rem 0.9rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+.banner--err {
+  background: #fff0f4;
+  color: var(--pink-600);
+  border: 1px solid #ffd6e6;
+}
+
+/* --- Success --------------------------------------------------------------- */
+.success { text-align: center; }
+.success__title { color: var(--wine-700); font-size: 1.5rem; }
+.success__sub { color: var(--muted); margin-top: 0.25rem; }
+.success__img {
+  width: 100%;
+  border-radius: var(--radius-sm);
+  margin: 1rem 0;
+  object-fit: cover;
+  max-height: 280px;
+}
+
+.meta {
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  margin-bottom: 1.25rem;
+}
+.meta > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 0.5rem;
+}
+.meta dt { color: var(--muted); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.06em; }
+.meta dd { color: var(--ink); font-weight: 600; text-align: right; }
+.mono { font-family: ui-monospace, 'SFMono-Regular', Menlo, monospace; font-size: 0.78rem; }
+
+/* --- Loading --------------------------------------------------------------- */
+.loading { text-align: center; color: var(--muted); padding: 2rem 1rem; }
+
+/* --- Auth / sign-in -------------------------------------------------------- */
+.auth { text-align: center; align-items: center; }
+.auth__mark { font-size: 2.6rem; }
+.auth__title { color: var(--wine-700); font-size: 1.5rem; }
+.auth__sub { color: var(--muted); font-size: 0.95rem; max-width: 34ch; }
+.auth__legal { font-size: 0.8rem; color: var(--muted); }
+.auth__legal a, .consent a, .app__footer a, .legal a { color: var(--pink-600); font-weight: 600; }
+
+.btn-google {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7rem;
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #3c4043;
+  background: #fff;
+  border: 1.5px solid #dadce0;
+  border-radius: 999px;
+  padding: 0.8rem 1.5rem;
+  cursor: pointer;
+  transition: box-shadow 0.2s, background 0.2s;
+}
+.btn-google:hover { box-shadow: 0 2px 8px rgba(60, 64, 67, 0.18); background: #fafafa; }
+
+/* --- User badge ------------------------------------------------------------ */
+.userbadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 999px;
+  padding: 0.3rem 0.4rem 0.3rem 0.5rem;
+  font-size: 0.85rem;
+}
+.userbadge__avatar { width: 26px; height: 26px; border-radius: 50%; object-fit: cover; }
+.userbadge__name { color: #fff; font-weight: 600; max-width: 12ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.userbadge__signout {
+  background: #fff; color: var(--wine-700); border: none;
+  border-radius: 999px; padding: 0.3rem 0.7rem; font-weight: 700;
+  font-size: 0.78rem; cursor: pointer;
+}
+
+/* --- Consent gate ---------------------------------------------------------- */
+.consent__title { color: var(--wine-700); font-size: 1.4rem; }
+.consent__sub { color: var(--muted); font-size: 0.92rem; }
+.consent__check {
+  display: flex;
+  gap: 0.65rem;
+  align-items: flex-start;
+  font-size: 0.9rem;
+  line-height: 1.45;
+  background: var(--off);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  padding: 0.8rem 0.9rem;
+}
+.consent__check input { margin-top: 0.2rem; width: 18px; height: 18px; accent-color: var(--pink-500); flex-shrink: 0; }
+.consent__foot { font-size: 0.78rem; color: var(--muted); text-align: center; }
+
+/* --- Legal pages ----------------------------------------------------------- */
+.legal {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 1.25rem;
+  color: var(--ink);
+}
+.legal__header {
+  background: var(--grad-wine);
+  color: #fff;
+  border-radius: var(--radius);
+  padding: 1.5rem 1.4rem;
+  margin-bottom: 1.5rem;
+}
+.legal__back {
+  background: rgba(255, 255, 255, 0.16);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 999px;
+  padding: 0.35rem 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 0.82rem;
+}
+.legal__title { margin-top: 0.8rem; font-size: 1.7rem; letter-spacing: -0.02em; }
+.legal__meta { opacity: 0.9; font-size: 0.85rem; margin-top: 0.25rem; }
+
+.legal__body { font-size: 0.95rem; line-height: 1.65; }
+.legal__body h2 {
+  color: var(--wine-700);
+  font-size: 1.1rem;
+  margin: 1.6rem 0 0.5rem;
+}
+.legal__body h2.legal__warn { color: var(--pink-600); }
+.legal__body p { margin-bottom: 0.8rem; }
+.legal__body ul { margin: 0 0 0.9rem 1.2rem; display: flex; flex-direction: column; gap: 0.35rem; }
+.legal__body strong { color: var(--ink); }
+.legal__note {
+  margin-top: 2rem;
+  padding: 0.9rem 1rem;
+  background: #fff7fa;
+  border: 1px dashed var(--pink-400);
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  font-style: italic;
+  color: var(--wine-700);
+}
+.legal__footer {
+  margin-top: 2rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--line);
+  display: flex;
+  gap: 0.6rem;
+  justify-content: center;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
