@@ -1,6 +1,9 @@
-// Centralized API helper. Base URL comes from the Vite env var so the same
-// build can point at localhost in dev and the droplet in production.
-export const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
+// Centralized API helper.
+// - Production (Vercel): VITE_API_URL is empty, so API_URL is "" and requests go
+//   to same-origin paths like /api/sightings and /uploads/... which Vercel
+//   rewrites to the droplet backend (see vercel.json). No CORS, no mixed content.
+// - Local dev: frontend/.env sets VITE_API_URL=http://localhost:4000.
+export const API_URL = import.meta.env.VITE_API_URL ?? '';
 
 // Parse a response into JSON and, on failure, throw an Error enriched with the
 // fields the auth flow cares about (status, requiresConsent, requiredVersions).
