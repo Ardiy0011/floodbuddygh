@@ -27,7 +27,7 @@ export default function SignIn() {
           <span className="gbtn__chip">
             <GoogleMark />
           </span>
-          Continue with Google
+          <span className="gbtn__text">Continue with Google</span>
         </button>
 
         {error && <p className="signin__err">{error}</p>}
