@@ -81,3 +81,24 @@ export async function getSighting(id) {
   const sighting = await parse(res);
   return { ...sighting, imageUrl: API_URL + sighting.image };
 }
+
+// --- Broadcasts (public-safety alerts) --------------------------------------
+
+/** Active safety alerts — online clients poll this. */
+export async function getActiveBroadcasts() {
+  const res = await fetch(`${API_URL}/api/broadcasts/active`);
+  return parse(res);
+}
+
+/** Admin only — send a public-safety message to all online users. */
+export async function postBroadcast(idToken, { message, severity }) {
+  const res = await fetch(`${API_URL}/api/broadcasts`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${idToken}`,
+    },
+    body: JSON.stringify({ message, severity: severity || null }),
+  });
+  return parse(res);
+}

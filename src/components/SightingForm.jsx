@@ -6,6 +6,13 @@ import { useGeolocation } from '../hooks/useGeolocation.js';
 import { createSighting, API_URL } from '../api/client.js';
 import { reverseGeocode, formatCoords } from '../lib/geocode.js';
 
+// Quick-select severity options — colors match the map legend.
+const SEVERITY_OPTIONS = [
+  { label: 'Minor', value: 'Minor flooding', color: '#2a9d8f' },
+  { label: 'Moderate', value: 'Moderate flooding', color: '#f4a261' },
+  { label: 'Severe', value: 'Severe flooding', color: '#e5383b' },
+];
+
 export default function SightingForm({ initialCoords, onClose }) {
   const [file, setFile] = useState(null);
   const [severity, setSeverity] = useState('');
@@ -47,7 +54,7 @@ export default function SightingForm({ initialCoords, onClose }) {
 
     if (!file) return setError('Please add a photo of the flooding.');
     if (!location) return setError('Please set the location of the flooding.');
-    if (!severity.trim()) return setError('Please describe how severe the flooding is.');
+    if (!severity) return setError('Please select how severe the flooding is.');
 
     try {
       setSubmitting(true);
@@ -120,15 +127,21 @@ export default function SightingForm({ initialCoords, onClose }) {
         </section>
 
         <section className="field">
-          <label className="field__label" htmlFor="severity">How severe is it?</label>
-          <textarea
-            id="severity"
-            className="field__input"
-            rows={3}
-            placeholder="e.g. Knee-deep water across Main St, rising fast, two cars stalled."
-            value={severity}
-            onChange={(e) => setSeverity(e.target.value)}
-          />
+          <label className="field__label">How severe is it?</label>
+          <div className="sevpick">
+            {SEVERITY_OPTIONS.map((o) => (
+              <button
+                key={o.value}
+                type="button"
+                className={`sevpick__btn${severity === o.value ? ' is-selected' : ''}`}
+                style={{ '--sev': o.color }}
+                onClick={() => setSeverity(o.value)}
+              >
+                <span className="sevpick__dot" />
+                {o.label}
+              </button>
+            ))}
+          </div>
         </section>
 
         {error && <p className="banner banner--err">{error}</p>}

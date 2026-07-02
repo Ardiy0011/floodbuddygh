@@ -3,7 +3,11 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { API_URL } from '../api/client.js';
 import { useTheme } from '../theme/ThemeContext.jsx';
+import { useBroadcasts } from '../hooks/useBroadcasts.js';
 import Menu from './Menu.jsx';
+import BroadcastBanner from './BroadcastBanner.jsx';
+import NotificationPrompt from './NotificationPrompt.jsx';
+import AdminPortal from './AdminPortal.jsx';
 
 // The app is confined to Accra. These bounds box the metro area; the map
 // resists panning past them and we flash a red edge glow when you push against
@@ -42,6 +46,9 @@ function escapeHtml(s = '') {
 // flood-prone overlay ignores this and shows all reports historically.)
 const LIVE_WINDOW_MS = 16 * 60 * 60 * 1000;
 
+// On mount / re-locate, the map drones into the user with this radius framed.
+const FIVE_MILES_M = 5 * 1609.344;
+
 function timeAgo(iso) {
   const mins = Math.round((Date.now() - new Date(iso).getTime()) / 60000);
   if (mins < 1) return 'just now';
@@ -74,12 +81,15 @@ export default function MapView({ userCoords, geoStatus, onLocate, onReport, ref
   const markersRef = useRef(null);
   const zonesRef = useRef(null);
   const userMarkerRef = useRef(null);
+  const radiusRef = useRef(null);
   const clearGlowTimer = useRef(null);
   const [sightings, setSightings] = useState([]);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [adminOpen, setAdminOpen] = useState(false);
   const [showZones, setShowZones] = useState(false);
   const [glow, setGlow] = useState(NO_GLOW);
   const { theme } = useTheme();
+  const broadcasts = useBroadcasts();
 
   // Initialise the map once (locked to Accra).
   useEffect(() => {
@@ -134,17 +144,29 @@ export default function MapView({ userCoords, geoStatus, onLocate, onReport, ref
     if (maskRef.current) maskRef.current.setStyle({ fillColor: maskColor(theme) });
   }, [theme]);
 
-  // Recenter + "you are here" marker when we get the user's location.
+  // On mount / re-locate: drop the "you are here" marker, draw a 5-mile ring,
+  // and drone the map into the user framing that radius (clamped to Accra).
   useEffect(() => {
     const map = mapRef.current;
     if (!map || !userCoords) return;
     const latlng = [userCoords.latitude, userCoords.longitude];
-    map.setView(latlng, 15); // clamped to Accra bounds automatically
+
     if (userMarkerRef.current) userMarkerRef.current.remove();
     userMarkerRef.current = L.marker(latlng, {
       icon: L.divIcon({ className: 'me-marker', html: '<span></span>', iconSize: [18, 18] }),
       interactive: false,
     }).addTo(map);
+
+    if (radiusRef.current) radiusRef.current.remove();
+    radiusRef.current = L.circle(latlng, {
+      radius: FIVE_MILES_M,
+      color: '#2563eb', weight: 1, opacity: 0.35,
+      fillColor: '#2563eb', fillOpacity: 0.05, interactive: false,
+    }).addTo(map);
+
+    // Smooth "drone-in" to frame the 5-mile radius (flyToBounds animates; plain
+    // fitBounds would just jump). padding keeps the ring off the screen edges.
+    map.flyToBounds(radiusRef.current.getBounds(), { duration: 1.5, padding: [24, 24] });
   }, [userCoords]);
 
   // Load flood sightings (public route) and re-load after a new report.
@@ -221,6 +243,11 @@ export default function MapView({ userCoords, geoStatus, onLocate, onReport, ref
         <button className="map__menu" onClick={() => setMenuOpen(true)} aria-label="Open menu">☰</button>
       </div>
 
+      <div className="map__alerts">
+        <BroadcastBanner broadcasts={broadcasts} />
+        <NotificationPrompt />
+      </div>
+
       {showZones && <div className="map__zones-flag">🏠 Flood-prone areas</div>}
 
       <div className="map__legend">
@@ -249,7 +276,10 @@ export default function MapView({ userCoords, geoStatus, onLocate, onReport, ref
         onClose={() => setMenuOpen(false)}
         zonesOn={showZones}
         onToggleZones={() => setShowZones((v) => !v)}
+        onOpenAdmin={() => setAdminOpen(true)}
       />
+
+      {adminOpen && <AdminPortal onClose={() => setAdminOpen(false)} />}
     </div>
   );
 }
