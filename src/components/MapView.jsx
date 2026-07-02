@@ -3,7 +3,11 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { API_URL } from '../api/client.js';
 import { useTheme } from '../theme/ThemeContext.jsx';
+import { useBroadcasts } from '../hooks/useBroadcasts.js';
 import Menu from './Menu.jsx';
+import BroadcastBanner from './BroadcastBanner.jsx';
+import NotificationPrompt from './NotificationPrompt.jsx';
+import AdminPortal from './AdminPortal.jsx';
 
 // The app is confined to Accra. These bounds box the metro area; the map
 // resists panning past them and we flash a red edge glow when you push against
@@ -81,9 +85,11 @@ export default function MapView({ userCoords, geoStatus, onLocate, onReport, ref
   const clearGlowTimer = useRef(null);
   const [sightings, setSightings] = useState([]);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [adminOpen, setAdminOpen] = useState(false);
   const [showZones, setShowZones] = useState(false);
   const [glow, setGlow] = useState(NO_GLOW);
   const { theme } = useTheme();
+  const broadcasts = useBroadcasts();
 
   // Initialise the map once (locked to Accra).
   useEffect(() => {
@@ -237,6 +243,11 @@ export default function MapView({ userCoords, geoStatus, onLocate, onReport, ref
         <button className="map__menu" onClick={() => setMenuOpen(true)} aria-label="Open menu">☰</button>
       </div>
 
+      <div className="map__alerts">
+        <BroadcastBanner broadcasts={broadcasts} />
+        <NotificationPrompt />
+      </div>
+
       {showZones && <div className="map__zones-flag">🏠 Flood-prone areas</div>}
 
       <div className="map__legend">
@@ -265,7 +276,10 @@ export default function MapView({ userCoords, geoStatus, onLocate, onReport, ref
         onClose={() => setMenuOpen(false)}
         zonesOn={showZones}
         onToggleZones={() => setShowZones((v) => !v)}
+        onOpenAdmin={() => setAdminOpen(true)}
       />
+
+      {adminOpen && <AdminPortal onClose={() => setAdminOpen(false)} />}
     </div>
   );
 }

@@ -3,7 +3,7 @@ import { useTheme } from '../theme/ThemeContext.jsx';
 
 // Slide-out drawer: account, appearance (dark mode), settings, and sign out.
 // Always mounted; the `open` prop drives the slide/backdrop transitions.
-export default function Menu({ open, onClose, zonesOn, onToggleZones }) {
+export default function Menu({ open, onClose, zonesOn, onToggleZones, onOpenAdmin }) {
   const { user, signOut } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const isDark = theme === 'dark';
@@ -44,6 +44,19 @@ export default function Menu({ open, onClose, zonesOn, onToggleZones }) {
             </button>
           </div>
         </section>
+
+        {user?.isAdmin && (
+          <section className="drawer__section">
+            <span className="drawer__label">Admin</span>
+            <button
+              type="button"
+              className="drawer__link drawer__admin"
+              onClick={() => { onOpenAdmin(); onClose(); }}
+            >
+              🛡️ Send safety broadcast
+            </button>
+          </section>
+        )}
 
         <section className="drawer__section">
           <span className="drawer__label">Renting</span>
