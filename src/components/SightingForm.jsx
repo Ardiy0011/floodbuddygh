@@ -6,12 +6,9 @@ import { useGeolocation } from '../hooks/useGeolocation.js';
 import { createSighting, API_URL } from '../api/client.js';
 import { reverseGeocode, formatCoords } from '../lib/geocode.js';
 
-// The "how severe is it?" input is commented out for now (not needed yet).
-// Reports are saved with this placeholder so the record + map markers still work.
-const DEFAULT_SEVERITY = 'Unspecified';
-
 export default function SightingForm({ initialCoords, onClose }) {
   const [file, setFile] = useState(null);
+  const [severity, setSeverity] = useState('');
   const [location, setLocation] = useState(null); // { latitude, longitude, label }
   const [resolving, setResolving] = useState(false);
   const [manual, setManual] = useState(false); // user picked a spot on the map
@@ -50,6 +47,7 @@ export default function SightingForm({ initialCoords, onClose }) {
 
     if (!file) return setError('Please add a photo of the flooding.');
     if (!location) return setError('Please set the location of the flooding.');
+    if (!severity.trim()) return setError('Please describe how severe the flooding is.');
 
     try {
       setSubmitting(true);
@@ -58,7 +56,7 @@ export default function SightingForm({ initialCoords, onClose }) {
         image: file,
         latitude: location.latitude,
         longitude: location.longitude,
-        severity: DEFAULT_SEVERITY,
+        severity: severity.trim(),
         idToken,
       });
       setResult(saved);
@@ -78,6 +76,10 @@ export default function SightingForm({ initialCoords, onClose }) {
           <p className="success__sub">Thank you for keeping your community safe.</p>
           <img className="success__img" src={API_URL + result.image} alt="Submitted flood sighting" />
           <dl className="meta">
+            <div>
+              <dt>Severity</dt>
+              <dd>{result.severity}</dd>
+            </div>
             <div>
               <dt>Location</dt>
               <dd>{location?.label || formatCoords(result.latitude, result.longitude)}</dd>
@@ -117,7 +119,6 @@ export default function SightingForm({ initialCoords, onClose }) {
           )}
         </section>
 
-        {/* Severity input is commented out for now — not needed yet.
         <section className="field">
           <label className="field__label" htmlFor="severity">How severe is it?</label>
           <textarea
@@ -129,7 +130,6 @@ export default function SightingForm({ initialCoords, onClose }) {
             onChange={(e) => setSeverity(e.target.value)}
           />
         </section>
-        */}
 
         {error && <p className="banner banner--err">{error}</p>}
 

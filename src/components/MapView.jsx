@@ -12,7 +12,6 @@ const ACCRA_BOUNDS = L.latLngBounds([
   [5.50, -0.33], // south-west
   [5.73, 0.02],  // north-east
 ]);
-const ACCRA_CENTER = [5.6037, -0.187];
 
 const TILES = {
   light: 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
@@ -37,6 +36,20 @@ function escapeHtml(s = '') {
   return s.replace(/[&<>"']/g, (c) => (
     { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]
   ));
+}
+
+// Live flood markers only show for 16 hours after a report. (The "Renting"
+// flood-prone overlay ignores this and shows all reports historically.)
+const LIVE_WINDOW_MS = 16 * 60 * 60 * 1000;
+
+function timeAgo(iso) {
+  const mins = Math.round((Date.now() - new Date(iso).getTime()) / 60000);
+  if (mins < 1) return 'just now';
+  if (mins < 60) return `${mins} min${mins === 1 ? '' : 's'} ago`;
+  const hrs = Math.round(mins / 60);
+  if (hrs < 24) return `${hrs} hr${hrs === 1 ? '' : 's'} ago`;
+  const days = Math.round(hrs / 24);
+  return `${days} day${days === 1 ? '' : 's'} ago`;
 }
 
 // Which edges of the current view are pressed against the Accra bounds.
@@ -73,10 +86,13 @@ export default function MapView({ userCoords, geoStatus, onLocate, onReport, ref
     const map = L.map(containerRef.current, {
       zoomControl: false,
       maxBounds: ACCRA_BOUNDS,
-      maxBoundsViscosity: 1.0, // solid wall
-      minZoom: 12,
+      maxBoundsViscosity: 1.0, // solid wall — can't drag outside Accra
       maxZoom: 18,
-    }).setView(ACCRA_CENTER, 13);
+    });
+    // Fit Accra to the screen, then forbid zooming out past that. Combined with
+    // maxBounds this means the view can NEVER leave Accra, on any screen size.
+    map.fitBounds(ACCRA_BOUNDS);
+    map.setMinZoom(map.getZoom());
     L.control.zoom({ position: 'bottomright' }).addTo(map);
 
     // Mask everything outside Accra, and outline the confine.
@@ -141,12 +157,14 @@ export default function MapView({ userCoords, geoStatus, onLocate, onReport, ref
     return () => { alive = false; };
   }, [refreshKey]);
 
-  // Plot the flood-zone markers.
+  // Plot the LIVE flood markers — only reports from the last 16 hours.
   useEffect(() => {
     const layer = markersRef.current;
     if (!layer) return;
     layer.clearLayers();
-    sightings.forEach((s) => {
+    const cutoff = Date.now() - LIVE_WINDOW_MS;
+    const live = sightings.filter((s) => new Date(s.created_at).getTime() >= cutoff);
+    live.forEach((s) => {
       const color = severityColor(s.severity);
       const marker = L.marker([s.latitude, s.longitude], {
         icon: L.divIcon({
@@ -158,7 +176,12 @@ export default function MapView({ userCoords, geoStatus, onLocate, onReport, ref
       });
       const img = `${API_URL}${s.image}`;
       marker.bindPopup(
-        `<div class="leaflet-popup-card"><img src="${img}" alt="" /><p>${escapeHtml(s.severity)}</p></div>`
+        `<div class="leaflet-popup-card">
+           <img src="${img}" alt="" />
+           <p class="popup__sev">${escapeHtml(s.severity)}</p>
+           <p class="popup__time">🕒 Reported ${timeAgo(s.created_at)}</p>
+           <p class="popup__warn">⚠ Conditions may have changed since this report — stay cautious.</p>
+         </div>`
       );
       marker.addTo(layer);
     });
