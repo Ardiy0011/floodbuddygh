@@ -438,6 +438,28 @@ button { font-family: inherit; }
 .field__input::placeholder { color: var(--muted); }
 .field__input:focus { outline: none; border-color: var(--pink-400); }
 
+/* --- Severity quick-select ------------------------------------------------- */
+.sevpick { display: flex; gap: 0.6rem; }
+.sevpick__btn {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  padding: 0.75rem 0.5rem;
+  border: 1.5px solid var(--line);
+  border-radius: var(--r-sm);
+  background: var(--surface);
+  color: var(--text);
+  font-family: inherit;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+.sevpick__dot { width: 12px; height: 12px; border-radius: 50%; background: var(--sev); flex-shrink: 0; }
+.sevpick__btn.is-selected { border-color: var(--sev); color: var(--sev); }
+
 /* --- File picker (the primary tap target) ---------------------------------- */
 .picker { display: flex; flex-direction: column; gap: 0.7rem; }
 .picker__drop {
