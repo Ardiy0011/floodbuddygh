@@ -1,11 +1,49 @@
 import { useEffect, useRef, useState } from 'react';
 import { getActiveBroadcasts } from '../api/client.js';
 
-// Polls for active safety alerts (so "online" users get them) and fires a
-// browser notification the first time each new alert is seen.
+const NOTIFIED_KEY = 'fb_notified_broadcasts';
+
+function loadNotified() {
+  try {
+    return new Set(JSON.parse(localStorage.getItem(NOTIFIED_KEY) || '[]'));
+  } catch (_e) {
+    return new Set();
+  }
+}
+function saveNotified(set) {
+  try {
+    localStorage.setItem(NOTIFIED_KEY, JSON.stringify([...set]));
+  } catch (_e) {
+    /* ignore */
+  }
+}
+
+// Show a system/tray notification. Prefers the service worker's
+// showNotification (works on mobile); falls back to new Notification (desktop).
+async function showAlert(title, options) {
+  if (!('Notification' in window) || Notification.permission !== 'granted') return;
+  try {
+    if ('serviceWorker' in navigator) {
+      const reg = await navigator.serviceWorker.ready;
+      await reg.showNotification(title, options);
+      return;
+    }
+  } catch (_e) {
+    /* fall through */
+  }
+  try {
+    new Notification(title, options);
+  } catch (_e) {
+    /* ignore */
+  }
+}
+
+// Polls for active safety alerts (so "online" users get them) and fires a tray
+// notification the FIRST time each new alert is seen — persisted, so a refresh
+// doesn't re-notify for the same alert.
 export function useBroadcasts({ pollMs = 45000 } = {}) {
   const [broadcasts, setBroadcasts] = useState([]);
-  const notified = useRef(new Set());
+  const notified = useRef(loadNotified());
 
   useEffect(() => {
     let alive = true;
@@ -17,25 +55,19 @@ export function useBroadcasts({ pollMs = 45000 } = {}) {
         setBroadcasts(list);
 
         const canNotify = 'Notification' in window && Notification.permission === 'granted';
-        if (canNotify) {
-          // newest first from the API; notify oldest-first so order feels right
-          [...list].reverse().forEach((b) => {
-            if (!notified.current.has(b.id)) {
-              notified.current.add(b.id);
-              try {
-                new Notification('FloodBuddy safety alert', {
-                  body: b.message,
-                  tag: b.id, // dedupe if the OS already shows it
-                });
-              } catch (_e) {
-                /* ignore */
-              }
-            }
-          });
-        } else {
-          // still track ids so we don't spam once permission is later granted
-          list.forEach((b) => notified.current.add(b.id));
-        }
+        let changed = false;
+
+        // newest-first from the API; notify oldest-first so order reads right
+        [...list].reverse().forEach((b) => {
+          if (notified.current.has(b.id)) return;
+          notified.current.add(b.id);
+          changed = true;
+          if (canNotify) {
+            showAlert('FloodBuddy safety alert', { body: b.message, tag: b.id });
+          }
+        });
+
+        if (changed) saveNotified(notified.current);
       } catch (_e) {
         /* network hiccup — try again next tick */
       }
