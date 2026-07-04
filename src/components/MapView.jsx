@@ -48,6 +48,9 @@ const LIVE_WINDOW_MS = 16 * 60 * 60 * 1000;
 
 // On mount / re-locate, the map drones into the user with this radius framed.
 const FIVE_MILES_M = 5 * 1609.344;
+// How close the "drone-in" lands — tight enough that the radius edge and the
+// Accra boundary sit off-screen (no visible demarcation lines).
+const HONE_ZOOM = 15;
 
 function timeAgo(iso) {
   const mins = Math.round((Date.now() - new Date(iso).getTime()) / 60000);
@@ -105,12 +108,9 @@ export default function MapView({ userCoords, geoStatus, onLocate, onReport, ref
     map.setMinZoom(map.getZoom());
     L.control.zoom({ position: 'bottomright' }).addTo(map);
 
-    // Mask everything outside Accra, and outline the confine.
+    // Mask everything outside Accra (no visible outline — just hide the outside).
     maskRef.current = L.polygon([MASK_OUTER, ACCRA_RING], {
       stroke: false, fillColor: maskColor(theme), fillOpacity: 1, interactive: false,
-    }).addTo(map);
-    L.rectangle(ACCRA_BOUNDS, {
-      fill: false, color: '#e5383b', weight: 1.5, opacity: 0.35, dashArray: '6 6', interactive: false,
     }).addTo(map);
 
     markersRef.current = L.layerGroup().addTo(map);
@@ -160,13 +160,13 @@ export default function MapView({ userCoords, geoStatus, onLocate, onReport, ref
     if (radiusRef.current) radiusRef.current.remove();
     radiusRef.current = L.circle(latlng, {
       radius: FIVE_MILES_M,
-      color: '#2563eb', weight: 1, opacity: 0.35,
-      fillColor: '#2563eb', fillOpacity: 0.05, interactive: false,
+      stroke: false, // no hard ring — just a soft area highlight
+      fillColor: '#2563eb', fillOpacity: 0.06, interactive: false,
     }).addTo(map);
 
-    // Smooth "drone-in" to frame the 5-mile radius (flyToBounds animates; plain
-    // fitBounds would just jump). padding keeps the ring off the screen edges.
-    map.flyToBounds(radiusRef.current.getBounds(), { duration: 1.5, padding: [24, 24] });
+    // Smooth "drone-in": fly right into the user's position at a close zoom, so
+    // the radius edge and Accra boundary stay off-screen (no demarcation visible).
+    map.flyTo(latlng, HONE_ZOOM, { duration: 1.6 });
   }, [userCoords]);
 
   // Load flood sightings (public route) and re-load after a new report.
